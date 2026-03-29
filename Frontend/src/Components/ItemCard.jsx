@@ -42,7 +42,7 @@ function ItemCard({ data }) {
     }
 
     return (
-        <div className='w-62.5 rounded-2xl border-2 border-[#ff4d2d] bg-white shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col'>
+        <div className='w-60 rounded-2xl border-2 border-[#ff4d2d] bg-white shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col'>
             <div className='relative w-full h-42.5 flex justify-center items-center bg-white'>
                 <div className='absolute top-3 right-3 bg-white rounded-full p-1 shadow'>{data.foodType == "veg" ? <FaLeaf className='text-green-600 text-lg' /> : <FaDrumstickBite className='text-red-600 text-lg' />}</div>
 

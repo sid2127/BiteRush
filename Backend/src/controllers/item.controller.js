@@ -153,7 +153,7 @@ const getItemsByShopId = asynchandler(async (req, res) => {
         new ApiResponse(
             200,
             {
-                items
+                items , shop
             },
             items.length === 0
                 ? "No items found"
@@ -172,57 +172,24 @@ const searchItems = asynchandler(async (req, res) => {
         throw new ApiError(400, "query and city are required");
     }
 
-    const items = await Item.aggregate([
-        // 1️⃣ Match item name
-        {
-            $match: {
-                name: { $regex: query, $options: "i" }
-            }
-        },
+    const shop = await Shop.find({
+        city: { $regex: `^${city}$`, $options: "i" }
+    });
 
-        // 2️⃣ Join with Shop
-        {
-            $lookup: {
-                from: "shops", // collection name
-                localField: "itemOwner",
-                foreignField: "_id",
-                as: "shop",
-                pipeline: [
-                    {
-                        $project: {
-                            name: 1,
-                            city: 1,
-                            address: 1,
-                            shopImage: 1
-                        }
-                    }
-                ]
-            }
-        },
+    if (shop.length === 0) {
+        throw new ApiError(404, "No shop found in this city");
+    }
 
-        // 3️⃣ Convert shop array → object
-        {
-            $unwind: "$shop"
-        },
+    const shopIds = shop.map((s) => s._id);
 
-        // 4️⃣ Match city
-        {
-            $match: {
-                "shop.city": { $regex: `^${city}$`, $options: "i" }
-            }
-        },
-
-        // 5️⃣ Final response shape (optional but recommended)
-        {
-            $project: {
-                name: 1,
-                price: 1,
-                category: 1,
-                foodType: 1,
-                imageUrl: 1
-            }
-        }
-    ]);
+    // 2️⃣ Find items
+    const items = await Item.find({
+        itemOwner: { $in: shopIds },
+        $or: [
+            { name: { $regex: query, $options: "i" } },
+            { category: { $regex: query, $options: "i" } }
+        ]
+    }).populate("itemOwner", "name shopImage address");
 
     return res.status(200).json(
         new ApiResponse(200, items, "Items fetched successfully")

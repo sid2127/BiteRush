@@ -233,6 +233,41 @@ const getCurrentUser = asynchandler(async (req, res) => {
         )
 })
 
+//update location
+
+const updateLocation = asynchandler(async(req , res)=> {
+    const {lat , lon} = req.body;
+
+    if(!lat || !lon){
+        throw new ApiError(400 , "no latitude or longitude found")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            location: {
+                type: 'Point',
+                coordinates: [lon , lat]
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    if(!user){
+        throw new ApiError(500 , "unable to update location")
+    }
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200,
+            user,
+            "Location update sucessfully"
+        )
+    )
+})
 
 
-export { registerUser, loginUser, logoutUser, GoogleLogin, getCurrentUser };
+
+export { registerUser, loginUser, logoutUser, GoogleLogin, getCurrentUser , updateLocation};

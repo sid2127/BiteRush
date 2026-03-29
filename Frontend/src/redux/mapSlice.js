@@ -3,8 +3,8 @@ import { map } from "leaflet";
 
 const initialState = {
     location: {
-        lat: null,
-        lon: null
+        lat: 29.157843,
+        lon: 79.52660399999999,
     },
     address: "",
 }

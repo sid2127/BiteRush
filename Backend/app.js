@@ -1,8 +1,22 @@
 import express from 'express'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import http from 'http'
+import { Server } from 'socket.io';
 
 const app = express();
+
+const server = http.createServer(app);
+
+const io = new Server(server , {
+    cors: {
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+    methods: ["POST" , "GET" , "PUT"]
+}
+})
+
+app.set("io" , io);
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
@@ -17,13 +31,14 @@ import authRouter from './src/routes/auth.routes.js';
 import shopRouter from './src/routes/shop.routes.js';
 import itemRouter from './src/routes/item.routes.js';
 import orderRouter from './src/routes/order.routes.js'
+import { socketHandler } from './socket.js';
 
 app.use("/api/v1/auth" , authRouter)
 app.use("/api/v1/shop" , shopRouter)
 app.use("/api/v1/item" , itemRouter)
 app.use("/api/v1/order" , orderRouter)
 
+socketHandler(io);
 
 
-
-export {app}
+export {app , server}

@@ -29,14 +29,14 @@ function Checkout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { location, address } = useSelector(state => state.map);
-  const cartItems  = useSelector(state=> state.user.Cart);
-  const totalAmount  = useSelector(state=> state.user.totalAmount);
+  const cartItems = useSelector(state => state.user.Cart);
+  const totalAmount = useSelector(state => state.user.totalAmount);
 
   const deliveryFee = totalAmount > 500 ? 0 : 50;
   const AmountWithDeliveryFee = totalAmount + deliveryFee;
 
   const [addressInput, setAddressInput] = useState(address);
-  const [paymentMethod , setPaymentMethod] = useState("Cod")
+  const [paymentMethod, setPaymentMethod] = useState("Cod")
 
   const onDragEnd = (e) => {
     console.log(e);
@@ -82,30 +82,76 @@ function Checkout() {
     }
   }
 
-  const handlePlaceOrder = async()=> {
-    try {
-      const result = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/order/createOrder`,
-        {
-          cartItems,
-          deliveryAddress: {
-            text: address,
-            latitude: location.lat,
-            longitude: location.lon
-          },
-          PaymentMode: paymentMethod
+  const handlePlaceOrder = async () => {
+  try {
+    const result = await axios.post(
+      `${import.meta.env.VITE_SERVER_URL}/api/v1/order/createOrder`,
+      {
+        cartItems,
+        deliveryAddress: {
+          text: address,
+          latitude: location.lat,
+          longitude: location.lon
         },
-        {withCredentials: true}
-      )
+        paymentMethod // ✅ FIXED
+      },
+      { withCredentials: true }
+    );
 
-      console.log(result);
-      navigate('/order-complete');
-      
-    } catch (error) {
-      console.log(error);
-      
+    // 💵 COD
+    if (paymentMethod === "Cod") {
+      navigate("/order-complete");
+    } else {
+      const { razorOrder, orderId } = result.data.data;
+      openRazorpayWindow(orderId, razorOrder);
     }
-  }
 
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+  const openRazorpayWindow = (orderId, razorOrder) => {
+
+  const options = {
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+    amount: razorOrder.amount,
+    currency: "INR",
+    name: "Vingo",
+    description: "Food Order",
+    order_id: razorOrder.id,
+
+    handler: async function (response) {
+      try {
+        await axios.post(
+          `${import.meta.env.VITE_SERVER_URL}/api/v1/order/verifyPayment`,
+          {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            orderId
+          },
+          { withCredentials: true }
+        );
+
+        navigate("/order-complete");
+
+      } catch (error) {
+        console.log(error);
+        alert("Payment verification failed");
+      }
+    },
+
+    modal: {
+      ondismiss: function () {
+        console.log("Payment cancelled");
+      }
+    }
+  };
+
+  const rzp = new window.Razorpay(options);
+  rzp.open();
+};
   return (
     <div className='min-h-screen bg-[#fff9f6] flex items-center justify-center p-6'>
       <div className=' absolute top-5 left-5 z-10' onClick={() => navigate("/")}>
@@ -200,7 +246,7 @@ function Checkout() {
           </div>
         </section>
 
-        <button className='w-full bg-[#ff4d2d] hover:bg-[#e64526] text-white py-3 rounded-xl font-semibold' onClick={()=> handlePlaceOrder()}> {paymentMethod == "Cod" ? "Place Order" : "Pay & Place Order"}</button>
+        <button className='w-full bg-[#ff4d2d] hover:bg-[#e64526] text-white py-3 rounded-xl font-semibold' onClick={() => handlePlaceOrder()}> {paymentMethod == "Cod" ? "Place Order" : "Pay & Place Order"}</button>
 
 
       </div>

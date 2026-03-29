@@ -9,7 +9,10 @@ const initialState = {
     shopsInCity: null,
     itemsInCity: null,
     Cart: [],
-    totalAmount: 0
+    totalAmount: 0,
+    searchItems: [],
+    socket: null,
+    loading : true
 }
 
 const userSlice = createSlice({
@@ -65,10 +68,20 @@ const userSlice = createSlice({
             state.totalAmount -= item.price * item.quantity;
 
             state.Cart = state.Cart.filter(ele => ele.itemId !== itemId);
+        },
+        SetSearchItem: (state , action) => {
+            state.searchItems = action.payload
+        },
+        SetSocketId: (state, action) => {
+            state.socket = action.payload;
+        },
+        SetLoading : (state , action)=> {
+            state.loading = action.payload
         }
 
     }
 })
 
-export const { setUserData, currentCity, currentState, currentAddress, ShopsIncity, ItemsInCity, AddToCart, UpdateQuantity, DeleteItem } = userSlice.actions;
+export const { setUserData, currentCity, currentState, currentAddress, ShopsIncity, ItemsInCity, AddToCart, UpdateQuantity, DeleteItem, SetSearchItem , SetSocketId , SetLoading} = userSlice.actions;
+
 export default userSlice.reducer

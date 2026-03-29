@@ -1,10 +1,12 @@
+
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
+        index: true
     },
 
     shops: [{
@@ -20,33 +22,33 @@ const orderSchema = new mongoose.Schema({
                 ref: 'Item',
                 required: true
             },
-            quantity: {
-                type: Number,
-                required: true
-            },
-            price: {
-                type: Number,
-                required: true
-            }
+            quantity: Number,
+            price: Number
         }],
 
-        subTotal: {
-            type: Number,
-            required: true
-        },
+        subTotal: Number,
 
         status: {
             type: String,
             enum: ['Pending', 'Preparing', 'Out for Delivery', 'Delivered'],
             default: 'Pending'
-        }
+        },
+
+        deliveryAssignment: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "DeliveryAssignment"
+        },
+
+        deliveryBoy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        },
+
 
     }],
 
-    totalAmount: {
-        type: Number,
-        required: true
-    },
+    totalAmount: Number,
 
     deliveryAddress: {
         text: String,
@@ -58,8 +60,31 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Cod', 'Online'],
         required: true
+    },
+
+    orderStatus: {
+        type: String,
+        enum: ["pending", "paid", "failed", "placed"],
+        default: "pending"
+    },
+    payment: {
+        type: Boolean,
+        default: false
+    },
+    razorpayOrderId: {
+        type: String,
+        default: ""
+    },
+    razorpayPaymentId: {
+        type: String,
+        default: ""
     }
 
 }, { timestamps: true });
 
-export const Order =  mongoose.model("Order", orderSchema);
+orderSchema.index({ "shops.shop": 1 });
+orderSchema.index({ "shops.status": 1 });
+orderSchema.index({ createdAt: -1 });
+
+
+export const Order = mongoose.model("Order", orderSchema);

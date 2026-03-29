@@ -2,13 +2,13 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
-import { FaUtensils, FaEdit, FaPen } from "react-icons/fa";
+import { FaUtensils, FaPen } from "react-icons/fa";
 import useGetShopDetails from '../hooks/useGetShopDetails';
-
 import { useNavigate } from 'react-router-dom';
 import ShopItems from './ShopItems';
 import useGetShopItems from '../hooks/useGetShopItems';
 import { setShopDetails } from '../redux/shopSlice';
+import { setAllOrders } from '../redux/orderSlice';
 
 function OwnerDashboard() {
 
@@ -16,6 +16,7 @@ function OwnerDashboard() {
     useGetShopItems();
 
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const fullname = useSelector((state) => state.user.userInfo?.fullname);
     const shopDetails = useSelector((state) => state.shop?.shopDetails);
@@ -25,6 +26,29 @@ function OwnerDashboard() {
     const navigate = useNavigate();
 
     const str = fullname?.charAt(0).toUpperCase();
+
+    const handleOrders = async () => {
+        try {
+
+            setLoading(true);
+
+            const orders = await axios.get(
+                `${import.meta.env.VITE_SERVER_URL}/api/v1/order/getAllOrders`,
+                { withCredentials: true }
+            );
+
+            console.log(orders);
+            
+            dispatch(setAllOrders(orders.data.data));
+
+            navigate("/my-orders");
+
+        } catch (error) {
+            console.error("Failed to fetch orders", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleLogout = async () => {
         try {
@@ -51,14 +75,26 @@ function OwnerDashboard() {
 
                 {shopDetails && (
                     <div className='flex gap-3'>
-                        <button className='w-48 rounded-2xl bg-amber-500 py-2' onClick={()=> navigate('/add-item')}>
-                            <span className='mr-1'>+</span>
-                            Add Food Items
+
+                        <button
+                            className='w-48 rounded-2xl bg-amber-500 py-2'
+                            onClick={() => navigate('/add-item')}
+                        >
+                            + Add Food Items
                         </button>
 
-                        <button className='w-48 rounded-2xl bg-amber-500 py-2'>
-                            My Orders
+                        <button
+                            className='w-48 rounded-2xl bg-amber-500 py-2 flex items-center justify-center'
+                            onClick={handleOrders}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                                "My Orders"
+                            )}
                         </button>
+
                     </div>
                 )}
 
@@ -114,10 +150,11 @@ function OwnerDashboard() {
                 </div>
             )}
 
-            {/* SHOP DETAILS CARD */}
+            {/* SHOP DETAILS */}
             {shopDetails && (
                 <div className='w-full flex justify-center px-6 mt-10'>
                     <div className='bg-white shadow-lg rounded-xl overflow-hidden w-full max-w-3xl relative'>
+
                         <div
                             className='absolute top-4 right-4 bg-[#ff4d2d] text-white p-2 rounded-full cursor-pointer'
                             onClick={() => navigate("/create-edit")}
@@ -146,15 +183,24 @@ function OwnerDashboard() {
                 </div>
             )}
 
+            {/* NO FOOD ITEMS */}
             {shopItems.length === 0 &&
                 <div className='flex justify-center items-center p-4 sm:p-6'>
                     <div className='w-full max-w-md bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300'>
                         <div className='flex flex-col items-center text-center'>
                             <FaUtensils className='text-[#ff4d2d] w-16 h-16 sm:w-20 sm:h-20 mb-4' />
-                            <h2 className='text-xl sm:text-2xl font-bold text-gray-800 mb-2'>Add Your Food Item</h2>
-                            <p className='text-gray-600 mb-4 text-sm sm:text-base'>Share your delicious creations with our customers by adding them to the menu.
+                            <h2 className='text-xl sm:text-2xl font-bold text-gray-800 mb-2'>
+                                Add Your Food Item
+                            </h2>
+
+                            <p className='text-gray-600 mb-4 text-sm sm:text-base'>
+                                Share your delicious creations with our customers by adding them to the menu.
                             </p>
-                            <button className='bg-[#ff4d2d] text-white px-5 sm:px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 transition-colors duration-200' onClick={() => navigate("/add-item")}>
+
+                            <button
+                                className='bg-[#ff4d2d] text-white px-5 sm:px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 transition-colors duration-200'
+                                onClick={() => navigate("/add-item")}
+                            >
                                 Add Food
                             </button>
                         </div>
@@ -162,16 +208,15 @@ function OwnerDashboard() {
                 </div>
             }
 
+            {/* FOOD ITEMS */}
             {shopItems.length > 0 &&
                 <div className='flex flex-col items-center gap-4 w-full max-w-3xl ml-96 mt-6 mb-3'>
                     {shopItems.map((item) => (
                         <ShopItems data={item} key={item._id} />
                     ))}
-
-
                 </div>
-
             }
+
         </>
     );
 }
