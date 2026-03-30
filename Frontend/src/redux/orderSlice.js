@@ -10,7 +10,9 @@ const orderSlice = createSlice({
     initialState,
     reducers: {
         setAllOrders: (state, action) => {
-            state.order = action.payload;
+            state.order = Array.isArray(action.payload)
+            ? action.payload
+            : [];
         },
         updateStatus: (state, action) => {
             const { orderId, shopId, status } = action.payload;
@@ -26,9 +28,12 @@ const orderSlice = createSlice({
             })
         },
         addOrder: (state, action) => {
-            state.order.unshift(action.payload);
-        }
+            if (!Array.isArray(state.order)) {
+              state.order = [];
+            }
 
+             state.order.unshift(action.payload);
+}
     }
 })
 
