@@ -15,18 +15,25 @@ const orderSlice = createSlice({
             : [];
         },
         updateStatus: (state, action) => {
-            const { orderId, shopId, status } = action.payload;
+    const { orderId, shopId, status } = action.payload;
 
-            state.order.forEach((order, index) => {
-                if (order._id === orderId) {
-                    order.shops.forEach((shop, index) => {
-                        if (shop.shop._id === shopId) {
-                            shop.status = status;
-                        }
-                    })
+    state.order = state.order.map(order => {
+        if (String(order._id) !== String(orderId)) return order;
+
+        return {
+            ...order,
+            shops: order.shops.map(shop => {
+                const currentShopId = shop.shop?._id || shop.shop;
+
+                if (String(currentShopId) === String(shopId)) {
+                    return { ...shop, status };
                 }
+
+                return shop;
             })
-        },
+        };
+    });
+},
         addOrder: (state, action) => {
             if (!Array.isArray(state.order)) {
               state.order = [];
