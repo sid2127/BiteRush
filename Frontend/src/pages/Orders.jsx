@@ -14,31 +14,31 @@ function Orders() {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (!socket || !user) return;
+ useEffect(() => {
+  if (!socket || !user?._id) return;
 
-    const newOrderhandler = (data) => {
-      if (data?.shops?.[0]?.shop?.owner?._id === user._id) {
-        dispatch(addOrder(data)); // ✅ correct
-      }
-    };
+  const statusUpdatehandler = (data) => {
+    console.log("🔥 SOCKET EVENT RECEIVED:", data);   // ✅ DEBUG
 
-    const statusUpdatehandler = (data) => {
-      if (orders && orders.length > 0) {
-        dispatch(updateStatus({ orderId: data.id, shopId: data.shops[0].shop?._id || data.shops[0].shop, status: data.shops[0].status }))
-      }
-    }
+    const orderId = data?.id || data?._id;
+    const shopId = data?.shops?.[0]?.shop?._id || data?.shops?.[0]?.shop;
 
-    socket.on("newOrder", newOrderhandler);
-    socket.on("orderStatusUpdated", statusUpdatehandler);
+    if (!orderId || !shopId) return;
 
-    return () => {
-      socket.off("newOrder", newOrderhandler);
-      socket.off("orderStatusUpdated", statusUpdatehandler)
-    };
+    dispatch(updateStatus({
+      orderId,
+      shopId,
+      status: data?.shops?.[0]?.status
+    }));
+  };
 
-  }, [user, socket]);
+  socket.on("orderStatusUpdated", statusUpdatehandler);
 
+  return () => {
+    socket.off("orderStatusUpdated", statusUpdatehandler);
+  };
+
+}, [user?._id, socket, dispatch]);
   return (
     <div className='"w-full min-h-screen bg-[#fff9f6] flex justify-center px-4'>
       <div className='w-full max-w-200 p-4'>
