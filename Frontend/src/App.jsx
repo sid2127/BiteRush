@@ -47,9 +47,9 @@ function App() {
   console.log(userData?.role);
 
 
-  // useGetShopsByCity();
-  // useGetItemsByCity();
-  // useGetAllOrders();
+  useGetShopsByCity();
+  useGetItemsByCity();
+  useGetAllOrders();
 
   const loading = useSelector(state => state.user.loading);
 

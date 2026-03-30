@@ -28,49 +28,77 @@ const generate_Acess_Refresh_Token = async (user) => {
 
 const registerUser = asynchandler(async (req, res) => {
 
-    const { fullname, email, mobile, password, role } = req.body;
+    const {
+        fullname,
+        email,
+        mobile,
+        password,
+        role,
+        address   // ✅ NEW
+    } = req.body;
 
-    if ([fullname, email, mobile, password, role].some((val) => val?.trim() === "")) {
+    // ✅ Validate basic fields
+    if ([fullname, email, mobile, password, role].some((val) => !val || val.toString().trim() === "")) {
         throw new ApiError(400, "All Fields are required");
     }
 
+    // ✅ Validate address fields
+    if (
+        !address ||
+        !address.addressLine1 ||
+        !address.city ||
+        !address.state ||
+        !address.pincode
+    ) {
+        throw new ApiError(400, "Complete address is required");
+    }
+
+    // ✅ Check existing user
     const userExist = await User.findOne({
-        $or: [
-            { email }, { mobile }]
+        $or: [{ email }, { mobile }]
     });
 
     if (userExist) {
-        throw new ApiError(400, "User already registerd")
+        throw new ApiError(400, "User already registered");
     }
 
+    // ✅ Create user with address
     const user = await User.create({
         fullname,
         mobile,
         email,
         password,
-        role
-    })
+        role,
+        address: {
+            addressLine1: address.addressLine1,
+            addressLine2: address.addressLine2 || "",
+            city: address.city,
+            state: address.state,
+            pincode: address.pincode
+        }
+    });
 
     if (!user) {
-        throw new ApiError(500, "Internal server error ! Please enter all details again");
+        throw new ApiError(500, "Internal server error! Please try again");
     }
 
-    const { accessToken, refreshToken } = await generate_Acess_Refresh_Token(user)
+    // ✅ Generate tokens
+    const { accessToken, refreshToken } = await generate_Acess_Refresh_Token(user);
 
     if (!accessToken || !refreshToken) {
-        throw new ApiError(500, "Not able to generate Acess token or refresh token")
+        throw new ApiError(500, "Unable to generate tokens");
     }
 
+    // ✅ Remove sensitive data
     const logInUser = await User.findById(user._id).select(
         "-password -refreshToken"
-    )
+    );
 
     const option = {
         httpOnly: true,
         secure: true,
         sameSite: "none"
-    }
-
+    };
 
     return res.status(200)
         .cookie("accessToken", accessToken, option)
@@ -79,12 +107,14 @@ const registerUser = asynchandler(async (req, res) => {
             new ApiResponse(
                 200,
                 {
-                    user: logInUser, accessToken, refreshToken
+                    user: logInUser,
+                    accessToken,
+                    refreshToken
                 },
                 "User Registered Successfully"
             )
-        )
-})
+        );
+});
 
 const loginUser = asynchandler(async (req, res) => {
     const { email, password } = req.body;

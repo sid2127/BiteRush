@@ -10,14 +10,11 @@ import useGetShopsByCity from '../hooks/useGetShopsByCity'
 
 function UserDashboard() {
 
-  const currentCity = useSelector(state => state.user.currentCity);
+  const currentCity = useSelector(state => state.user.userInfo.address.city);
   const shopInMyCity = useSelector(state => state.user.shopsInCity);
   const ItemsInMyCity = useSelector(state => state.user.itemsInCity);
 
   const navigate = useNavigate();
-
-  useGetItemsByCity();
-  useGetShopsByCity();
 
 
   return (
