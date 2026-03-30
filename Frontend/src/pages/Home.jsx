@@ -3,10 +3,14 @@ import { useSelector } from 'react-redux'
 import UserDashboard from '../Components/UserDashboard';
 import OwnerDashboard from '../Components/OwnerDashboard';
 import DeliveryBoyDashboard from '../Components/DeliveryBoyDashboard';
+import useGetAllOrders from '../hooks/useGetAllOrders';
+
 
 function Home() {
     const userData = useSelector((state) => state.user.userInfo)
     const role = userData?.role;
+
+    useGetAllOrders();
 
   return (
     <>

@@ -5,6 +5,8 @@ import CategoryCard from './CategoryCard'
 import { useSelector } from 'react-redux'
 import ItemCard from './ItemCard'
 import { useNavigate } from 'react-router-dom'
+import useGetItemsByCity from '../hooks/useGetItemsByCity'
+import useGetShopsByCity from '../hooks/useGetShopsByCity'
 
 function UserDashboard() {
 
@@ -13,6 +15,9 @@ function UserDashboard() {
   const ItemsInMyCity = useSelector(state => state.user.itemsInCity);
 
   const navigate = useNavigate();
+
+  useGetItemsByCity();
+  useGetShopsByCity();
 
 
   return (
