@@ -10,10 +10,12 @@ import { sentOtp } from "../utils/mail.js";
 import Razorpay from "razorpay";
 
 
-let instance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+const getRazorpayInstance = () => {
+    return new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET
+    });
+};
 
 //Create Order
 const CreateOrder = asynchandler(async (req, res) => {
@@ -61,6 +63,9 @@ const CreateOrder = asynchandler(async (req, res) => {
 
     // 💵 Online
     if (paymentMethod === "Online") {
+
+        const instance = getRazorpayInstance();
+
         const razorOrder = await instance.orders.create({
             amount: totalAmount * 100,
             currency: "INR",
@@ -167,6 +172,8 @@ const VerifyPayment = asynchandler(async (req, res) => {
 
     const order = await Order.findById(orderId);
     if (!order) throw new ApiError(404, "Order not found");
+
+    const instance = getRazorpayInstance();
 
     const payment = await instance.payments.fetch(razorpay_payment_id);
 
