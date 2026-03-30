@@ -10,6 +10,7 @@ import { auth } from '../../firebase';
 import { ClipLoader } from 'react-spinners';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice.js';
+import { serverUrl } from '../App.jsx';
 
 
 function Login() {
@@ -31,7 +32,7 @@ function Login() {
         
         setLoading(true)
         try {
-            const result=await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login`,{
+            const result=await axios.post(`${serverUrl}/api/v1/auth/login`,{
                 email,password
             },{withCredentials:true})
             
@@ -51,7 +52,7 @@ function Login() {
              const provider=new GoogleAuthProvider()
              const result=await signInWithPopup(auth,provider)
        try {
-         const result=await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/googleAuth` ,{
+         const result=await axios.post(`${serverUrl}/api/v1/auth/googleAuth` ,{
              email:result.user.email,
          },{withCredentials:true})
 

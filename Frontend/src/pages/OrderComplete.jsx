@@ -4,12 +4,13 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {  setAllOrders } from '../redux/orderSlice';
+import { serverUrl } from '../App';
 function OrderPlaced() {
     const navigate=useNavigate();
     const dispatch = useDispatch();
 
     const handleOrders = async()=>{
-      const orders = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/order/getAllOrders`,
+      const orders = await axios.get(`${serverUrl}/api/v1/order/getAllOrders`,
       {withCredentials:true});
 
       console.log("Orders" , orders);

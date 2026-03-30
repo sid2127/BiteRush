@@ -6,6 +6,7 @@ import DeliveryBoyTracking from './DeliveryBoyTracking';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import { socket } from '../../socket';
+import { serverUrl } from '../App';
 
 function DeliveryBoyDashboard() {
 
@@ -71,7 +72,7 @@ function DeliveryBoyDashboard() {
     const GetCurrentlyAssignedOrder = async () => {
         try {
             const result = await axios.get(
-                `${import.meta.env.VITE_SERVER_URL}/api/v1/order/getCurrentOrder`,
+                `${serverUrl}/api/v1/order/getCurrentOrder`,
                 { withCredentials: true }
             );
 
@@ -87,7 +88,7 @@ function DeliveryBoyDashboard() {
     const AcceptOrder = async (assignmentId) => {
         try {
             const result = await axios.put(
-                `${import.meta.env.VITE_SERVER_URL}/api/v1/order/accept-Order/${assignmentId}`,
+                `${serverUrl}/api/v1/order/accept-Order/${assignmentId}`,
                 {},
                 { withCredentials: true }
             );
@@ -126,7 +127,7 @@ function DeliveryBoyDashboard() {
             }
 
             const result = await axios.get(
-                `${import.meta.env.VITE_SERVER_URL}/api/v1/order/generateOtp/${orderId}/${shopId}`,
+                `${serverUrl}/api/v1/order/generateOtp/${orderId}/${shopId}`,
                 { withCredentials: true }
             );
 
@@ -154,7 +155,7 @@ function DeliveryBoyDashboard() {
             }
 
             const result = await axios.get(
-                `${import.meta.env.VITE_SERVER_URL}/api/v1/order/validateOtp/${orderId}/${shopId}/${otp}`,
+                `${serverUrl}/api/v1/order/validateOtp/${orderId}/${shopId}/${otp}`,
                 { withCredentials: true }
             );
 
@@ -171,7 +172,7 @@ function DeliveryBoyDashboard() {
     const getAllBroadCastedOrders = async () => {
         try {
             const result = await axios.get(
-                `${import.meta.env.VITE_SERVER_URL}/api/v1/order/getAllBroadCastedOrders`,
+                `${serverUrl}/api/v1/order/getAllBroadCastedOrders`,
                 { withCredentials: true }
             );
 

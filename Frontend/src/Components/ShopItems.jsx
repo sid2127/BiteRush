@@ -4,6 +4,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { removeItem } from '../redux/shopSlice';
+import { serverUrl } from '../App';
 
 
 function ShopItems({ data }) {
@@ -11,7 +12,7 @@ function ShopItems({ data }) {
   const dispatch = useDispatch()
   const handleDelete = async () => {
     try {
-      const result = await axios.delete(`${import.meta.env.VITE_SERVER_URL}/api/v1/item/deleteItem/${data._id}`, { withCredentials: true })
+      const result = await axios.delete(`${serverUrl}/api/v1/item/deleteItem/${data._id}`, { withCredentials: true })
       dispatch(removeItem(data._id));
     } catch (error) {
       console.log(error)

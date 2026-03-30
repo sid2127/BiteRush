@@ -101,4 +101,5 @@ function App() {
   )
 }
 
+export const  serverUrl = "https://biterush-backend-rxbk.onrender.com";
 export default App

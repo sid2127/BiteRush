@@ -3,6 +3,7 @@ import React from 'react'
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
+import { serverUrl } from '../App';
 
 function NavbarDeliveryBoy() {
 
@@ -13,7 +14,7 @@ function NavbarDeliveryBoy() {
     const handleLogOut = async () => {
         try {
           await axios.post(
-            `${import.meta.env.VITE_SERVER_URL}/api/v1/auth/logout`,
+            `${serverUrl}/api/v1/auth/logout`,
     
             {},
             { withCredentials: true }

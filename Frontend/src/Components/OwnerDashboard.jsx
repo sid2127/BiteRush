@@ -9,6 +9,7 @@ import ShopItems from './ShopItems';
 import useGetShopItems from '../hooks/useGetShopItems';
 import { setShopDetails } from '../redux/shopSlice';
 import { setAllOrders } from '../redux/orderSlice';
+import { serverUrl } from '../App';
 
 function OwnerDashboard() {
 
@@ -33,7 +34,7 @@ function OwnerDashboard() {
             setLoading(true);
 
             const orders = await axios.get(
-                `${import.meta.env.VITE_SERVER_URL}/api/v1/order/getAllOrders`,
+                `${serverUrl}/api/v1/order/getAllOrders`,
                 { withCredentials: true }
             );
 
@@ -53,7 +54,7 @@ function OwnerDashboard() {
     const handleLogout = async () => {
         try {
             await axios.post(
-                `${import.meta.env.VITE_SERVER_URL}/api/v1/auth/logout`,
+                `${serverUrl}/api/v1/auth/logout`,
                 {},
                 { withCredentials: true }
             );

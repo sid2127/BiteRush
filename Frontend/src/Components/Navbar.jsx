@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { setAllOrders } from "../redux/orderSlice";
 import { useEffect } from "react";
 import ItemCard from "./ItemCard";
+import { serverUrl } from "../App";
 
 function Nav() {
 
@@ -34,7 +35,7 @@ function Nav() {
   const handleLogOut = async () => {
     try {
       await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/api/v1/auth/logout`,
+        `${serverUrl}/api/v1/auth/logout`,
 
         {},
         { withCredentials: true }
@@ -49,7 +50,7 @@ function Nav() {
   const SearchItem = async () => {
     try {
       const result = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/api/v1/item/searchItems?query=${query}&city=${currentCity}`,
+        `${serverUrl}/api/v1/item/searchItems?query=${query}&city=${currentCity}`,
         { withCredentials: true }
       )
 

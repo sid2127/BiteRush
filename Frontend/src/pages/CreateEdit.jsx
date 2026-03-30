@@ -7,6 +7,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { setShopDetails } from '../redux/shopSlice'
 import { ClipLoader } from 'react-spinners';
+import { serverUrl } from '../App';
 
 
 function CreateEditShop() {
@@ -41,7 +42,7 @@ function CreateEditShop() {
            if(backendImage){
             formData.append("image",backendImage)
            }
-           const result=await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/shop/create-edit`,formData,{withCredentials:true})
+           const result=await axios.post(`${serverUrl}/api/v1/shop/create-edit`,formData,{withCredentials:true})
            console.log(result);
            console.log(result.data.data);
            
