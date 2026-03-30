@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import 'dotenv/config';
 
 dotenv.config({
-    path: 'https://biterush-backend-rxbk.onrender.com'
+    path: './.env'
 });
 
 import { app , server } from "./app.js";
