@@ -67,7 +67,8 @@ const registerUser = asynchandler(async (req, res) => {
 
     const option = {
         httpOnly: true,
-        secure: true
+        secure: true,
+        sameSite: "none"
     }
 
 
@@ -116,8 +117,8 @@ const loginUser = asynchandler(async (req, res) => {
 
     const option = {
         httpOnly: true,
-        secure: false,       // ✅ MUST be false on localhost
-        sameSite: "lax"
+        secure: true,
+        sameSite: "none"
     }
 
 
@@ -155,7 +156,8 @@ const logoutUser = asynchandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: false,
+        secure: true,
+        sameSite: "none"
     }
 
     return res.status(200)
@@ -199,7 +201,8 @@ const GoogleLogin = asynchandler(async (req, res) => {
 
     const option = {
         httOnly: true,
-        secure: true
+        secure: true,
+  sameSite: "none"
     }
 
     return res.status(201)

@@ -10,7 +10,7 @@ const server = http.createServer(app);
 
 const io = new Server(server , {
     cors: {
-    origin: process.env.CORS_ORIGIN,
+    origin: "https://biterushfrontend.onrender.com",
     credentials: true,
     methods: ["POST" , "GET" , "PUT"]
 }
@@ -19,7 +19,7 @@ const io = new Server(server , {
 app.set("io" , io);
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: "https://biterushfrontend.onrender.com",
     credentials: true
 }));
 app.use(express.json({limit: '16mb'}));
