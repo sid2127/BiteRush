@@ -390,26 +390,29 @@ const ChangeStatus = asynchandler(async (req, res) => {
         await order.populate("shops.shop");
         await order.populate("shops.items.item", "name price foodType imageUrl");
 
-        const io = req.app.get('io');
+   const io = req.app.get('io');
 
-        if (io) {
-            availableBoys.forEach(async (b) => {
+if (io) {
+    for (const b of availableBoys) {
 
-                const userSocketId = await User.findById(b._id);
-
-                if (userSocketId) {
-                    io.to(userSocketId.socketId).emit("broadcasted-Orders", {
-                        assignmentId: deliveryAssignment._id,
-                        order: order._id,
-                        shop: order.shops[shopIndex].shop.name,
-                        shopAddress: order.shops[shopIndex].shop.address,
-                        items: order.shops[shopIndex].items || [],
-                        subTotal: order.shops[shopIndex].subTotal || 0,
-                        deliveryAddress: order.deliveryAddress
-                    })
-                }
-            })
+        if (!b?.socketId) {
+            console.log("❌ No socket for user:", b._id);
+            continue;
         }
+
+        console.log("📡 Sending to:", b.socketId);
+
+        io.to(b.socketId).emit("broadcasted-Orders", {
+            assignmentId: deliveryAssignment._id,
+            order: order._id,
+            shop: order.shops[shopIndex].shop?.name,
+            shopAddress: order.shops[shopIndex].shop?.address,
+            items: order.shops[shopIndex].items || [],
+            subTotal: order.shops[shopIndex].subTotal || 0,
+            deliveryAddress: order.deliveryAddress
+        });
+    }
+}
 
         const deliveryBoy = order.shops[shopIndex].deliveryBoy;
 
