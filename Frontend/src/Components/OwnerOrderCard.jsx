@@ -12,21 +12,37 @@ function OwnerOrderCard({ order }) {
   const dispatch = useDispatch();
 
 
-  const handleUpdate = async(shopId , status)=> {
-    try {
-      const result = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/order/updateStatus/${order._id}/${shopId}`,
-        {status},
-        {withCredentials: true}
-      )
+  const handleUpdate = async (shopId, status) => {
+  try {
 
-      console.log(result);
-      dispatch(updateStatus(order._id , shopId , status));
-      setAvailableBoys(result.data.data.deliveryBoysPayload);
-      
-    } catch (error) {
-      console.log(`Error on Change status ${error}`);
+    const orderId = order?._id;   // ✅ use correct source
+
+    if (!orderId || !shopId || !status) {
+      console.log("Invalid IDs", orderId, shopId);
+      return;
     }
+
+    const result = await axios.post(
+      `${import.meta.env.VITE_SERVER_URL}/api/v1/order/updateStatus/${orderId}/${shopId}`,
+      { status },
+      { withCredentials: true }
+    );
+
+    console.log(result);
+
+    // ✅ correct dispatch format
+    dispatch(updateStatus({
+      orderId,
+      shopId,
+      status
+    }));
+
+    setAvailableBoys(result?.data?.data?.deliveryBoysPayload || []);
+
+  } catch (error) {
+    console.log("Error on Change status", error);
   }
+};
 
   return (
     <div className='bg-white rounded-lg shadow p-4 space-y-4'>
