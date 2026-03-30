@@ -7,11 +7,11 @@ function UserOrderCard({ order }) {
 
   const navigate = useNavigate();
 
-  // ⭐ store rating per item
   const [ratings, setRatings] = useState({});
   const [hover, setHover] = useState({});
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleString('en-GB', {
       day: "2-digit",
@@ -22,6 +22,7 @@ function UserOrderCard({ order }) {
 
   // ⭐ handle rating click
   const handleRatingClick = (itemId, value) => {
+    if (!itemId) return;   // ✅ safety
     setRatings(prev => ({
       ...prev,
       [itemId]: value
@@ -30,6 +31,8 @@ function UserOrderCard({ order }) {
 
   // 📤 submit rating
   const handleSubmit = async (itemId) => {
+    if (!itemId) return;
+
     const rating = ratings[itemId];
 
     if (!rating) {
@@ -51,62 +54,74 @@ function UserOrderCard({ order }) {
     }
   };
 
+  if (!order) return null;
+
   return (
     <div className='bg-white rounded-lg shadow p-4 space-y-10 mb-4'>
 
       {/* 🔝 Order Header */}
       <div className='flex justify-between border-b pb-2'>
         <div>
-          <p className='font-semibold'>Order #{order._id}</p>
+          <p className='font-semibold'>Order #{order?._id || "N/A"}</p>
           <p className='text-sm text-gray-500'>
-            Date: {formatDate(order.createdAt)}
+            Date: {formatDate(order?.createdAt)}
           </p>
         </div>
 
         <div className='text-right'>
-          {order.paymentMethod === "Cod" ? (
+          {order?.paymentMethod === "Cod" ? (
             <p className='text-sm text-gray-500'>
-              {order.paymentMethod?.toUpperCase()}
+              {order?.paymentMethod?.toUpperCase()}
             </p>
           ) : (
             <p className='text-sm text-gray-500 font-semibold'>
-              Payment: {order.payment ? "true" : "false"}
+              Payment: {order?.payment ? "true" : "false"}
             </p>
           )}
           <p className='font-medium text-blue-600'>
-            {order.shops?.[0].status}
+            {order?.shops?.[0]?.status || "N/A"}
           </p>
         </div>
       </div>
 
       {/* 🏪 Shop Orders */}
-      {order.shops.map((shopOrder, shopIndex) => (
+      {order?.shops?.map((shopOrder, shopIndex) => (
         <div key={shopIndex} className='border rounded-lg p-3 bg-[#fffaf7] space-y-3'>
 
-          <p className='font-semibold'>{shopOrder.shop.name}</p>
+          <p className='font-semibold'>
+            {shopOrder?.shop?.name || "Shop removed"}
+          </p>
 
           {/* 🛒 Items */}
           <div className='flex space-x-4 overflow-x-auto pb-2'>
-            {shopOrder.items.map((itemWrapper, index) => {
-              const item = itemWrapper.item;
+            {shopOrder?.items?.map((itemWrapper, index) => {
+
+              const item = itemWrapper?.item;
+
+              // ✅ CRITICAL FIX (prevents crash)
+              if (!item) return null;
+
               const itemId = item._id;
 
               return (
                 <div key={index} className='shrink-0 bg-white rounded-lg p-2 w-40'>
 
                   <img
-                    src={item.imageUrl}
+                    src={item?.imageUrl || "/placeholder.png"}
                     alt=""
                     className='w-full h-24 object-cover rounded'
                   />
 
-                  <p className='text-sm font-semibold mt-1'>{item.name}</p>
+                  <p className='text-sm font-semibold mt-1'>
+                    {item?.name || "Item removed"}
+                  </p>
+
                   <p className='text-xs text-gray-500'>
-                    Qty: {itemWrapper.quantity} × ₹{item.price}
+                    Qty: {itemWrapper?.quantity || 0} × ₹{item?.price || 0}
                   </p>
 
                   {/* ⭐ Rating Section */}
-                  {shopOrder.status === "Delivered" && (
+                  {shopOrder?.status === "Delivered" && (
                     <div className='mt-2'>
 
                       <div className='flex gap-1 cursor-pointer'>
@@ -148,13 +163,13 @@ function UserOrderCard({ order }) {
           {/* 🔽 Shop Footer */}
           <div className='flex justify-between items-center border-t pt-2'>
             <p className='font-semibold'>
-              Subtotal: ₹{shopOrder.subTotal}
+              Subtotal: ₹{shopOrder?.subTotal || 0}
             </p>
 
             <button
               className='bg-blue-500 text-white rounded-md shadow px-2 py-1'
               onClick={() =>
-                navigate(`/track-order/${order._id}/${shopOrder.shop._id}`)
+                navigate(`/track-order/${order?._id}/${shopOrder?.shop?._id}`)
               }
             >
               Track Order
@@ -167,7 +182,7 @@ function UserOrderCard({ order }) {
       {/* 🔻 Total */}
       <div className='flex justify-between items-center border-t pt-2'>
         <p className='font-semibold'>
-          Total: ₹{order.totalAmount}
+          Total: ₹{order?.totalAmount || 0}
         </p>
       </div>
 
