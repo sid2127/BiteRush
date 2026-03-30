@@ -54,20 +54,22 @@ function App() {
   const loading = useSelector(state => state.user.loading);
 
   useEffect(() => {
-    socket.connect(); // manually connect
+  if (!userData?._id) return;
 
-    socket.on("connect", () => {
-      console.log("Socket ID:", socket.id);
+  socket.connect();
 
-      if (userData?._id) {
-        socket.emit("identity", { userId: userData._id });
-      }
-    });
+  socket.emit("identity", { userId: userData._id });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, [userData?._id]);
+  socket.on("connect", () => {
+    console.log("Socket ID:", socket.id);
+  });
+
+  return () => {
+    socket.off("connect");   // ✅ remove listener
+    socket.disconnect();
+  };
+
+}, [userData?._id]);
 
 
   if (loading) {
