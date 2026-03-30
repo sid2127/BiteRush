@@ -7,7 +7,6 @@ import home from '../assets/home.png';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import { socket } from '../../socket';
-import { serverUrl } from '../App';
 
 // ✅ Icons
 const deliveryBoyIcon = new L.Icon({
@@ -62,7 +61,7 @@ function TrackOrder() {
     const GetOrderDetail = async () => {
         try {
             const result = await axios.get(
-                `${serverUrl}/api/v1/order/getOrderById/${orderId}/${shopId}`,
+                `${import.meta.env.VITE_SERVER_URL}/api/v1/order/getOrderById/${orderId}/${shopId}`,
                 { withCredentials: true }
             );
 

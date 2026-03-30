@@ -6,7 +6,6 @@ import { useState } from 'react';
 import axios from 'axios';
 import { ClipLoader } from 'react-spinners';
 import { updateItem } from '../redux/shopSlice';
-import { serverUrl } from "../App";
 
 function EditItems() {
 
@@ -56,7 +55,7 @@ function EditItems() {
                     formData.append("image" , backendImage)
                 }
 
-                const result = await axios.put(`${serverUrl}/api/v1/item/updateItem/${itemId}` ,
+                const result = await axios.put(`${import.meta.env.VITE_SERVER_URL}/api/v1/item/updateItem/${itemId}` ,
                     formData,
                     {withCredentials: true}
                 )

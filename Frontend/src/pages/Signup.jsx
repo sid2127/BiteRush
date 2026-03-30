@@ -10,7 +10,6 @@ import { auth } from '../../firebase.js';
 import { ClipLoader } from "react-spinners"
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice.js';
-import { serverUrl } from '../App.jsx';
 
 
 function SignUp() {
@@ -34,7 +33,7 @@ function SignUp() {
     const handleSignUp = async () => {
         setLoading(true)
         try {
-            const result = await axios.post(`${serverUrl}/api/v1/auth/signup`, {
+            const result = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/signup`, {
                 fullname, email, password, mobile, role
             }, { withCredentials: true })
 
@@ -74,7 +73,7 @@ function SignUp() {
 
             // ✅ Backend call (email is USED here)
             const data = await axios.post(
-                `${serverUrl}/api/v1/auth/googleAuth`,
+                `${import.meta.env.VITE_SERVER_URL}/api/v1/auth/googleAuth`,
                 {
                     fullname: user.displayName || "Google User",
                     email: user.email,          // ✅ email used correctly

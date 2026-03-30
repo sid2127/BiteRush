@@ -2,7 +2,6 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import ItemCard from '../Components/ItemCard';
-import { serverUrl } from '../App';
 
 function AllShopItems() {
 
@@ -15,7 +14,7 @@ function AllShopItems() {
 
     const GetShopItems = async () => {
         try {
-            const result = await axios.get(`${serverUrl}/api/v1/item/getItemsByShop/${shopId}`,
+            const result = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/item/getItemsByShop/${shopId}`,
                 { withCredentials: true }
             )
 

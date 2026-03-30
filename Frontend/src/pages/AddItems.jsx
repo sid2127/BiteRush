@@ -8,7 +8,6 @@ import { useRef } from 'react';
 import axios from 'axios';
 import { setItems } from '../redux/shopSlice';
 import { ClipLoader } from 'react-spinners';
-import { serverUrl } from '../App';
 function AddItem() {
     const navigate = useNavigate()
     const { myShopData } = useSelector(state => state.shop)
@@ -49,7 +48,7 @@ function AddItem() {
             if (backendImage) {
                 formData.append("image", backendImage)
             }
-            const result = await axios.post(`${serverUrl}/api/v1/item/createItem`, formData, { withCredentials: true })
+            const result = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/item/createItem`, formData, { withCredentials: true })
 
             console.log(result);
             dispatch(setItems(result.data.data))

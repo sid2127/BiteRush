@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from "react-icons/fa";
 import axios from 'axios';
-import { serverUrl } from '../App';
 
 function UserOrderCard({ order }) {
 
@@ -40,7 +39,7 @@ function UserOrderCard({ order }) {
 
     try {
       const res = await axios.post(
-        `${serverUrl}/api/v1/item/rating/${itemId}`,
+        `${import.meta.env.VITE_SERVER_URL}/api/v1/item/rating/${itemId}`,
         { rating }
       );
 

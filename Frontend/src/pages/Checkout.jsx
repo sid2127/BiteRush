@@ -13,7 +13,6 @@ import { setAddress, setLocation } from "../redux/mapSlice";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { serverUrl } from "../App";
 
 
 function RecenterMap({ location }) {
@@ -86,7 +85,7 @@ function Checkout() {
   const handlePlaceOrder = async () => {
   try {
     const result = await axios.post(
-      `${serverUrl}/api/v1/order/createOrder`,
+      `${import.meta.env.VITE_SERVER_URL}/api/v1/order/createOrder`,
       {
         cartItems,
         deliveryAddress: {
@@ -125,7 +124,7 @@ function Checkout() {
     handler: async function (response) {
       try {
         await axios.post(
-          `${serverUrl}/api/v1/order/verifyPayment`,
+          `${import.meta.env.VITE_SERVER_URL}/api/v1/order/verifyPayment`,
           {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
