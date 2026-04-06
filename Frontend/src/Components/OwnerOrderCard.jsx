@@ -13,7 +13,7 @@ function OwnerOrderCard({ order }) {
 
 
   const handleUpdate = async (shopId, status) => {
-<<<<<<< HEAD
+
   try {
 
     const orderId = order?._id;   // ✅ use correct source
@@ -42,7 +42,6 @@ function OwnerOrderCard({ order }) {
 
   } catch (error) {
     console.log("Error on Change status", error);
-=======
 
   const orderId = order?._id || order?.id;
 
@@ -51,7 +50,6 @@ function OwnerOrderCard({ order }) {
   if (!orderId || !shopId || !status) {
     console.log("❌ Something is missing");
     return;
->>>>>>> recovery-code
   }
 };
 
