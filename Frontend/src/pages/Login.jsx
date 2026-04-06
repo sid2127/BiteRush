@@ -36,13 +36,17 @@ function Login() {
                 email,password
             },{withCredentials:true})
             
-            console.log(`result: ${result}`);
+            console.log("FULL RESPONSE:", result);
+console.log("DATA:", result.data);
 
             if (result.data) {
   dispatch(setUserData(result.data.data.user));
-}
+            }
+
             
-            setLoading(false)
+            
+            setLoading(false);
+            navigate("/");
         } catch (error) {
            setErr(error?.response?.data?.message)
            setLoading(false)
