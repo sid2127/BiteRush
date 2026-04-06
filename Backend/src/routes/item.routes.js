@@ -17,7 +17,7 @@ router.route("/getItemById/:itemId").get(verifyJwt , getItemById);
 router.route("/deleteItem/:itemId").delete(verifyJwt , deleteItem);
 router.route("/getItemsByShop/:shopId").get(verifyJwt , getItemsByShopId);
 router.route("/searchItems").get(verifyJwt ,searchItems );
-router.route("/getItemsByCity/:city/:state").get(verifyJwt , getItemsByCity);
+router.route("/getItemsByCity/:latitude/:longitude").get(verifyJwt , getItemsByCity);
 router.route("/rating/:itemId").post(verifyJwt , rating);
 
 export default router;

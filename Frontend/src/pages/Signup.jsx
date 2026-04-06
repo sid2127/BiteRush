@@ -24,12 +24,6 @@ function SignUp() {
     const [password, setPassword] = useState("")
     const [mobile, setMobile] = useState("")
 
-    // ✅ NEW ADDRESS STATES
-    const [addressLine1, setAddressLine1] = useState("")
-    const [addressLine2, setAddressLine2] = useState("")
-    const [city, setCity] = useState("")
-    const [state, setState] = useState("")
-    const [pincode, setPincode] = useState("")
 
     const [err, setErr] = useState("")
     const [loading, setLoading] = useState(false);
@@ -47,14 +41,6 @@ function SignUp() {
                     password,
                     mobile,
                     role,
-                    // ✅ SEND ADDRESS OBJECT
-                    address: {
-                        addressLine1,
-                        addressLine2,
-                        city,
-                        state,
-                        pincode
-                    }
                 },
                 { withCredentials: true }
             )
@@ -65,6 +51,8 @@ function SignUp() {
 
             setErr("")
             setLoading(false)
+
+            navigate('/setLocation');
 
         } catch (error) {
             setErr(error?.response?.data?.message)
@@ -90,14 +78,7 @@ function SignUp() {
                     email: user.email,
                     role,
                     mobile,
-                    // ✅ ADD HERE ALSO
-                    address: {
-                        addressLine1,
-                        addressLine2,
-                        city,
-                        state,
-                        pincode
-                    }
+                    password
                 },
                 { withCredentials: true }
             );
@@ -155,36 +136,6 @@ function SignUp() {
                 </div>
 
                 {/* ✅ ADDRESS FIELDS */}
-
-                <div className='mb-4'>
-                    <label className='block text-gray-700'>Address Line 1</label>
-                    <input className='w-full border rounded-lg px-3 py-2'
-                        onChange={(e) => setAddressLine1(e.target.value)} value={addressLine1} />
-                </div>
-
-                <div className='mb-4'>
-                    <label className='block text-gray-700'>Address Line 2</label>
-                    <input className='w-full border rounded-lg px-3 py-2'
-                        onChange={(e) => setAddressLine2(e.target.value)} value={addressLine2} />
-                </div>
-
-                <div className='mb-4'>
-                    <label className='block text-gray-700'>City</label>
-                    <input className='w-full border rounded-lg px-3 py-2'
-                        onChange={(e) => setCity(e.target.value)} value={city} />
-                </div>
-
-                <div className='mb-4'>
-                    <label className='block text-gray-700'>State</label>
-                    <input className='w-full border rounded-lg px-3 py-2'
-                        onChange={(e) => setState(e.target.value)} value={state} />
-                </div>
-
-                <div className='mb-4'>
-                    <label className='block text-gray-700'>Pincode</label>
-                    <input type="number" className='w-full border rounded-lg px-3 py-2'
-                        onChange={(e) => setPincode(e.target.value)} value={pincode} />
-                </div>
 
                 {/* Role */}
                 <div className='mb-4 flex gap-2'>

@@ -111,35 +111,49 @@ const getShopDetails = asynchandler(async (req, res) => {
 //Shops By City
 
 const getShopsByCity = asynchandler(async (req, res) => {
-  const { city, state } = req.params;
 
-  if (!city || !state) {
-    throw new ApiError(400, "Provide city or state");
+  const { latitude, longitude } = req.params;
+
+  if (!latitude || !longitude) {
+    throw new ApiError(400, "Latitude and Longitude required");
   }
 
+  const lat = parseFloat(latitude);
+  const lon = parseFloat(longitude);
+
+  // ✅ Step 1: Find nearby OWNERS (Users with role = Owner)
+  const nearbyOwners = await User.find({
+    role: "Owner",
+    location: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [lon, lat] // ⚠️ [longitude, latitude]
+        },
+        $maxDistance: 10000 // 10 km
+      }
+    }
+  }).select("_id fullname location");
+
+  if (!nearbyOwners.length) {
+    return res.status(200).json(
+      new ApiResponse(200, [], "No shops nearby")
+    );
+  }
+
+  // ✅ Step 2: Extract owner IDs
+  const ownerIds = nearbyOwners.map(owner => owner._id);
+
+  // ✅ Step 3: Find shops of those owners
   const shops = await Shop.find({
-    city: { $regex: new RegExp(`^${city}$`, 'i') },
-    state: { $regex: new RegExp(`^${state}$`, 'i') }
-  })
+    owner: { $in: ownerIds }
+  }).populate("owner", "fullname email");
 
-  if(!shops){
-    return res.status(200)
-    .json(
-      new ApiResponse(200,
-        "No Shops Found in this region",
-      )
-    )
-  }
-
-  return res.status(200)
-  .json(
-    new ApiResponse(200 ,
-      shops,
-      "Succesfully fetched all shops"
-    )
-  )
-
-})
+  // ✅ Step 4: Response
+  return res.status(200).json(
+    new ApiResponse(200, shops, "Nearby shops fetched successfully")
+  );
+});
 
 
 export { createUpdateShopDetails, getShopDetails, getShopsByCity };

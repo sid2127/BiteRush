@@ -1,6 +1,6 @@
 import { asynchandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
-
+import axios from "axios";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import User from "../models/user.model.js"
 
@@ -27,33 +27,22 @@ const generate_Acess_Refresh_Token = async (user) => {
 
 
 const registerUser = asynchandler(async (req, res) => {
-
     const {
         fullname,
         email,
         mobile,
         password,
-        role,
-        address   // ✅ NEW
+        role
     } = req.body;
 
-    // ✅ Validate basic fields
-    if ([fullname, email, mobile, password, role].some((val) => !val || val.toString().trim() === "")) {
-        throw new ApiError(400, "All Fields are required");
+    // ✅ 1. Basic Validation
+    if ([fullname, email, mobile, password, role].some(
+        (val) => !val || val.toString().trim() === ""
+    )) {
+        throw new ApiError(400, "All fields are required");
     }
 
-    // ✅ Validate address fields
-    if (
-        !address ||
-        !address.addressLine1 ||
-        !address.city ||
-        !address.state ||
-        !address.pincode
-    ) {
-        throw new ApiError(400, "Complete address is required");
-    }
-
-    // ✅ Check existing user
+    // ✅ 2. Check existing user
     const userExist = await User.findOne({
         $or: [{ email }, { mobile }]
     });
@@ -62,57 +51,52 @@ const registerUser = asynchandler(async (req, res) => {
         throw new ApiError(400, "User already registered");
     }
 
-    // ✅ Create user with address
+    // ✅ 3. Create User (NO address / latlon)
     const user = await User.create({
         fullname,
-        mobile,
         email,
+        mobile,
         password,
-        role,
-        address: {
-            addressLine1: address.addressLine1,
-            addressLine2: address.addressLine2 || "",
-            city: address.city,
-            state: address.state,
-            pincode: address.pincode
-        }
+        role
     });
 
     if (!user) {
-        throw new ApiError(500, "Internal server error! Please try again");
+        throw new ApiError(500, "User registration failed");
     }
 
-    // ✅ Generate tokens
-    const { accessToken, refreshToken } = await generate_Acess_Refresh_Token(user);
+    // ✅ 4. Generate Tokens
+    const accessToken = user.generateAcessToken();
+    const refreshToken = user.generateRefreshToken();
 
-    if (!accessToken || !refreshToken) {
-        throw new ApiError(500, "Unable to generate tokens");
-    }
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
 
-    // ✅ Remove sensitive data
-    const logInUser = await User.findById(user._id).select(
-        "-password -refreshToken"
-    );
+    // ✅ 5. Remove sensitive data
+    const createdUser = await User.findById(user._id)
+        .select("-password -refreshToken");
 
-    const option = {
+    // ✅ 6. Cookie Options
+    const options = {
         httpOnly: true,
         secure: true,
         sameSite: "None",
         path: "/"
     };
 
-    return res.status(200)
-        .cookie("accessToken", accessToken, option)
-        .cookie("refreshToken", refreshToken, option)
+    // ✅ 7. Response
+    return res
+        .status(201)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
         .json(
             new ApiResponse(
-                200,
+                201,
                 {
-                    user: logInUser,
+                    user: createdUser,
                     accessToken,
                     refreshToken
                 },
-                "User Registered Successfully"
+                "User registered successfully"
             )
         );
 });
@@ -235,7 +219,7 @@ const GoogleLogin = asynchandler(async (req, res) => {
     const option = {
         httOnly: true,
         secure: true,
-  sameSite: "None",
+        sameSite: "None",
         path: "/"
     }
 
@@ -272,11 +256,11 @@ const getCurrentUser = asynchandler(async (req, res) => {
 
 //update location
 
-const updateLocation = asynchandler(async(req , res)=> {
-    const {lat , lon} = req.body;
+const updateLocation = asynchandler(async (req, res) => {
+    const { lat, lon } = req.body;
 
-    if(!lat || !lon){
-        throw new ApiError(400 , "no latitude or longitude found")
+    if (!lat || !lon) {
+        throw new ApiError(400, "no latitude or longitude found")
     }
 
     const user = await User.findByIdAndUpdate(
@@ -284,27 +268,27 @@ const updateLocation = asynchandler(async(req , res)=> {
         {
             location: {
                 type: 'Point',
-                coordinates: [lon , lat]
+                coordinates: [lon, lat]
             }
         },
         {
             new: true
         }
-    )
+    ).select("-password -refreshToken -socketId");
 
-    if(!user){
-        throw new ApiError(500 , "unable to update location")
+    if (!user) {
+        throw new ApiError(500, "unable to update location")
     }
 
     return res.status(200)
-    .json(
-        new ApiResponse(200,
-            user,
-            "Location update sucessfully"
+        .json(
+            new ApiResponse(200,
+                user,
+                "Location update sucessfully"
+            )
         )
-    )
 })
 
 
 
-export { registerUser, loginUser, logoutUser, GoogleLogin, getCurrentUser , updateLocation};
+export { registerUser, loginUser, logoutUser, GoogleLogin, getCurrentUser, updateLocation };

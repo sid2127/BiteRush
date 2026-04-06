@@ -39,6 +39,9 @@ function Orders() {
   };
 
 }, [user?._id, socket, dispatch]);
+
+
+
   return (
     <div className='"w-full min-h-screen bg-[#fff9f6] flex justify-center px-4'>
       <div className='w-full max-w-200 p-4'>
@@ -49,6 +52,12 @@ function Orders() {
           </div>
           <h1 className='text-2xl font-bold  text-start'>My Orders</h1>
         </div>
+        {!orders && orders.length === 0 &&
+          <div className='h-full flex items-center justify-center text-5xl font-extrabold'>
+            No Orders Found
+          </div>
+        }
+        {orders && orders.length > 0 &&
         <div className='space-y-24'>
           {Array.isArray(orders) && orders?.map((order, index) => (
             user.role == "User" ?
@@ -63,6 +72,7 @@ function Orders() {
                 null
           ))}
         </div>
+}
       </div>
     </div>
   )

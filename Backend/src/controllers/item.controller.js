@@ -5,6 +5,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { UploadOnCloudinary } from "../utils/cloudinary.js";
 import mongoose from "mongoose";
+import User from "../models/user.model.js";
 
 const createItem = asynchandler(async (req, res) => {
     const { name, description, price, category, foodType } = req.body;
@@ -269,52 +270,61 @@ const deleteItem = asynchandler(async (req, res) => {
 
 const getItemsByCity = asynchandler(async (req, res) => {
 
-   const { city, state } = req.params;
+  const { latitude, longitude } = req.params;
 
-   if (!city || !state) {
-      throw new ApiError(400, "City and state required");
-   }
+  if (!latitude || !longitude) {
+    throw new ApiError(400, "Latitude and Longitude required");
+  }
 
-   const items = await Item.aggregate([
+  const lat = parseFloat(latitude);
+  const lon = parseFloat(longitude);
 
-      // 1️⃣ Join with Shop collection
-      {
-         $lookup: {
-            from: "shops", // collection name (lowercase plural)
-            localField: "itemOwner",
-            foreignField: "_id",
-            as: "shop"
-         }
-      },
-
-      // 2️⃣ Convert shop array to object
-      {
-         $unwind: "$shop"
-      },
-
-      // 3️⃣ Match city and state
-      {
-         $match: {
-            "shop.city": { $regex: city, $options: "i" },
-            "shop.state": { $regex: state, $options: "i" }
-         }
+  // ✅ Step 1: Find nearby Owners
+  const nearbyOwners = await User.find({
+    role: "Owner",
+    location: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [lon, lat]
+        },
+        $maxDistance: 10000 // 10 km
       }
+    }
+  }).select("_id");
 
-   ]);
-
-   if(!items){
+  if (!nearbyOwners.length) {
     return res.status(200).json(
-        200,
-        "No items avialable"
-    )
-   }
+      new ApiResponse(200, [], "No nearby shops")
+    );
+  }
 
-   return res.status(200).json(
-    new ApiResponse(200,
-        items,
-        "Sucessfully fetched all items in city"
-    )
-   );
+  // ✅ Step 2: Extract owner IDs
+  const ownerIds = nearbyOwners.map(owner => owner._id);
+
+  // ✅ Step 3: Find shops of those owners
+  const shops = await Shop.find({
+    owner: { $in: ownerIds }
+  }).select("_id");
+
+  if (!shops.length) {
+    return res.status(200).json(
+      new ApiResponse(200, [], "No shops found")
+    );
+  }
+
+  // ✅ Step 4: Extract shop IDs
+  const shopIds = shops.map(shop => shop._id);
+
+  // ✅ Step 5: Find items of those shops
+  const items = await Item.find({
+    itemOwner: { $in: shopIds }
+  }).populate("itemOwner"); // optional
+
+  // ✅ Step 6: Response
+  return res.status(200).json(
+    new ApiResponse(200, items, "Items near your location")
+  );
 });
 
 
