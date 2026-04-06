@@ -13,6 +13,6 @@ router.route('/create-edit').post(
 )
 
 router.route('/get-shop').get(verifyJwt , getShopDetails)
-router.route('/getShopByCity/:city/:state').get(verifyJwt , getShopsByCity)
+router.route('/getShopByCity/:latitude/:longitude').get(verifyJwt , getShopsByCity)
 
 export default router;

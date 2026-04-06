@@ -10,7 +10,7 @@ import useGetShopsByCity from '../hooks/useGetShopsByCity'
 
 function UserDashboard() {
 
-  const currentCity = useSelector(state => state.user.userInfo.address.city);
+  // const currentCity = useSelector(state => state.user.userInfo.address.city);
   const shopInMyCity = useSelector(state => state.user.shopsInCity);
   const ItemsInMyCity = useSelector(state => state.user.itemsInCity);
 
@@ -36,7 +36,7 @@ function UserDashboard() {
 
       <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-2.5'>
         <h1 className='text-gray-800 text-2xl sm:text-3xl mt-24'>
-          Best Shop in {currentCity ? currentCity : "Loading..."}
+          Best Shop in Your Area
         </h1>
         <div className='w-full relative'>
           <div className='w-full flex overflow-x-auto gap-4 pb-2 '>

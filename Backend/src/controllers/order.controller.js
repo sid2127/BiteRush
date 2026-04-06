@@ -222,6 +222,7 @@ const GetAllOrder = asynchandler(async (req, res) => {
         if (orders.length == 0) {
             return res.status(200).json(
                 new ApiResponse(200,
+                    [],
                     "No Orders present"
                 )
             )
@@ -268,6 +269,7 @@ const GetAllOrder = asynchandler(async (req, res) => {
         if (orders.length == 0) {
             return res.status(200).json(
                 new ApiResponse(200,
+                    [],
                     "No Orders present"
                 )
             )
@@ -291,6 +293,10 @@ const ChangeStatus = asynchandler(async (req, res) => {
     if (!status) {
         throw new ApiError(400, "No status provided");
     }
+
+    if (!orderId || !shopId) {
+    throw new ApiError(400, "orderId or shopId missing");
+}
 
     const order = await Order.findById(orderId);
 

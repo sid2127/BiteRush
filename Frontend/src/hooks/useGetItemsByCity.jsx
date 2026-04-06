@@ -16,12 +16,15 @@ function useGetItemsByCity() {
 
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || !user.location || !user.location.coordinates[0]) return;
         if(user){
 
         async function getItems() {
             try {
-                const result = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/item/getItemsByCity/${user.address.city}/${user.address.state}`,
+                const latitude = user?.location?.coordinates?.[1];
+                const longitude = user?.location?.coordinates?.[0];
+
+                const result = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/item/getItemsByCity/${latitude}/${longitude}`,
                     { withCredentials: true }
                 )
 
@@ -34,7 +37,7 @@ function useGetItemsByCity() {
         }
 
         getItems();
-    }}, [ user])
+    }}, [ user, user?.location?.coordinates[0]])
 }
 
 export default useGetItemsByCity

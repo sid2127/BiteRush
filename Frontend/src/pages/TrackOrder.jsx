@@ -111,7 +111,7 @@ function TrackOrder() {
 
                 <div className="mb-2">
                     <span className="font-semibold">Subtotal: </span>
-                    ₹{orderData.shop?.subTotal || 0}
+                    ₹{orderData?.total || 0}
                 </div>
 
                 <div>

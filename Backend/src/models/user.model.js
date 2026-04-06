@@ -26,31 +26,11 @@ const userSchema = new mongoose.Schema({
         enum: ["User", "Owner", "Delivery Boy"],
         required: true
     },
-    address: {
-        addressLine1: {
-            type: String,
-            required: true
-        },
-        addressLine2: {
-            type: String
-        },
-        city: {
-            type: String,
-            required: true
-        },
-        state: {
-            type: String,
-            required: true
-        },
-        pincode: {
-            type: Number,
-            required: true
-        }
-    },
-
+    
     refreshToken: {
         type: String,
     },
+
     location: {
         type: { type: String, enum: ['Point'], default: 'Point' },
         coordinates: { type: [Number], default: [0, 0] }

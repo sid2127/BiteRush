@@ -26,19 +26,20 @@ import { SetSocketId } from './redux/userSlice'
 import { socket } from '../socket'
 
 
-
+;
+import SelectLocation from './pages/Location'
 
 function App() {
 
   useGetCurrentUser();
-  useGetLocation();
+  //useGetLocation();
 
 
   const userData = useSelector(state => state.user.userInfo);
   const shopData = useSelector(state => state.shop.shopDetails)
   const item = useSelector(state => state.shop.items)
-  const city = useSelector(state => state.user.currentCity)
-  const state = useSelector(state => state.user.currentState);
+  // const city = useSelector(state => state.user.currentCity)
+  // const state = useSelector(state => state.user.currentState);
   const orders = useSelector(state => state.order.order);
   const socketId = useSelector(state => state.user.socketId)
 
@@ -84,10 +85,17 @@ function App() {
         path="/signup"
         element={!userData ? <SignUp /> : <Navigate to="/" />}
       />
+      <Route path='/setLocation' element={userData ? <SelectLocation /> : <Navigate to={"/login"} />} />
       <Route
-        path="/"
-        element={userData ? <Home /> : <Navigate to="/login" />}
-      />
+  path="/"
+  element={
+    userData
+      ? (!userData?.location?.coordinates?.[0]
+          ? <Navigate to="/setLocation" />
+          : <Home />)
+      : <Navigate to="/login" />
+  }
+/>
       <Route path='/create-edit' element={userData ? <CreateEdit /> : <Navigate to="/login" />} />
       <Route path='/add-item' element={shopData ? <AddItems /> : <Navigate to="/" />} />
       <Route path='/edit-item/:itemId' element={item ? <EditItems /> : <Navigate to="/" />} />
@@ -97,6 +105,7 @@ function App() {
       <Route path='/my-orders' element={userData ? <Orders /> : <Navigate to={"/login"} />} />
       <Route path='/track-order/:orderId/:shopId' element={orders ? <TrackOrder /> : <Navigate to={"/"} />} />
       <Route path='/All-Items/:shopId' element={userData ? <AllShopItems /> : <Navigate to={"/login"} />} />
+      
     </Routes>
   )
 }

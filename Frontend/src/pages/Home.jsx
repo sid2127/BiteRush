@@ -4,6 +4,7 @@ import UserDashboard from '../Components/UserDashboard';
 import OwnerDashboard from '../Components/OwnerDashboard';
 import DeliveryBoyDashboard from '../Components/DeliveryBoyDashboard';
 import useGetAllOrders from '../hooks/useGetAllOrders';
+import LocationGuard from '../Components/LocationGuard';
 
 
 function Home() {
@@ -22,7 +23,10 @@ function Home() {
     }
     {
       role === "Delivery Boy" &&
+      <LocationGuard>
         <DeliveryBoyDashboard />
+      </LocationGuard>
+        
     }
     </>
   )

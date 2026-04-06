@@ -17,25 +17,30 @@ function useGetShopsByCity() {
 
     useEffect(() => {
 
-        if (!user) return;
-        if (user) {
-            async function getShops() {
-                try {
-                    const result = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/shop/getShopByCity/${user.address.city}/${user.address.state}`,
-                        { withCredentials: true }
-                    )
+        if (!user || !user.location || !user.location.coordinates) return;
 
-                    console.log(result);
-                    dispatch(ShopsIncity(result.data.data));
+        if (!user.location.coordinates[0]) return;
 
-                } catch (error) {
-                    console.log("Error in fetching shops in city", error);
-                }
+        async function getShops() {
+            try {
+                const latitude = user?.location?.coordinates?.[1];
+                const longitude = user?.location?.coordinates?.[0];
+                const result = await axios.get(
+                    `${import.meta.env.VITE_SERVER_URL}/api/v1/shop/getShopByCity/${latitude}/${longitude}`,
+                    { withCredentials: true }
+                );
+
+                console.log(result);
+                dispatch(ShopsIncity(result.data.data));
+
+            } catch (error) {
+                console.log("Error in fetching shops in city", error);
             }
-
-            getShops();
         }
-    }, [user])
+
+        getShops();
+
+    }, [user]);
 }
 
 export default useGetShopsByCity

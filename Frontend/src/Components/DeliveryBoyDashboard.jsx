@@ -16,56 +16,60 @@ function DeliveryBoyDashboard() {
     const [markDelivered, setMarkDelivered] = useState(false);
     const [otp, setOtp] = useState();
 
+
+
     const navigate = useNavigate();
 
     useEffect(() => {
-    if (!myCurrentOrder) return;
+        if (!myCurrentOrder) return;
 
-    let lastSent = 0;
+        let lastSent = 0;
 
-    const watchId = navigator.geolocation.watchPosition((pos) => {
-        const now = Date.now();
+        const watchId = navigator.geolocation.watchPosition((pos) => {
+            console.log("LIVE LOCATION:", pos.coords);
+            const now = Date.now();
 
-        if (now - lastSent > 3000) {
-            lastSent = now;
+            if (now - lastSent > 3000) {
+                lastSent = now;
 
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
 
-            // ✅ update UI
-            setMyCurrentOrder((prev) => {
-                if (!prev) return prev;
+                // ✅ update UI
+                setMyCurrentOrder((prev) => {
+                    if (!prev) return prev;
 
-                return {
-                    ...prev,
-                    deliveryOrder: {
-                        ...prev.deliveryOrder,
-                        assignedTo: {
-                            ...prev.deliveryOrder.assignedTo,
-                            location: {
-                                ...prev.deliveryOrder.assignedTo.location,
-                                coordinates: [lng, lat]
+                    return {
+                        ...prev,
+                        deliveryOrder: {
+                            ...prev.deliveryOrder,
+                            assignedTo: {
+                                ...prev.deliveryOrder.assignedTo,
+                                location: {
+                                    ...prev.deliveryOrder.assignedTo.location,
+                                    coordinates: [lng, lat]
+                                }
                             }
                         }
-                    }
-                };
-            });
+                    };
+                });
 
-            // ✅ emit socket
-            socket.emit("deliveryLocationUpdate", {
-                deliveryBoy: myCurrentOrder.deliveryOrder.assignedTo._id,
-                customer: myCurrentOrder.deliveryOrder.order.user._id,
-                lat,
-                lng
-            });
-        }
-    });
+                // ✅ emit socket
+                socket.emit("deliveryLocationUpdate", {
+                    deliveryBoy: myCurrentOrder.deliveryOrder.assignedTo._id,
+                    customer: myCurrentOrder.deliveryOrder.order.user._id,
+                    lat,
+                    lng
+                });
+            }
+        });
 
-    return () => {
-        navigator.geolocation.clearWatch(watchId);
-    };
+        return () => {
+            navigator.geolocation.clearWatch(watchId);
+        };
 
-}, [myCurrentOrder?._id]); // ✅ IMPORTANT FIX
+    }, [myCurrentOrder?._id]); // ✅ IMPORTANT FIX
+
 
     // ✅ Get current order
     const GetCurrentlyAssignedOrder = async () => {
