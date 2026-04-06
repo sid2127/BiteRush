@@ -8,12 +8,9 @@ function UserOrderCard({ order }) {
 
   const navigate = useNavigate();
 
-<<<<<<< HEAD
-=======
   const user = useSelector((state) => state.user.userInfo);
 
   // ⭐ store rating per item
->>>>>>> recovery-code
   const [ratings, setRatings] = useState({});
   const [hover, setHover] = useState({});
 
@@ -128,11 +125,7 @@ function UserOrderCard({ order }) {
                   </p>
 
                   {/* ⭐ Rating Section */}
-<<<<<<< HEAD
-                  {shopOrder?.status === "Delivered" && (
-=======
                   {shopOrder.status === "Delivered" &&(
->>>>>>> recovery-code
                     <div className='mt-2'>
 
                       <div className='flex gap-1 cursor-pointer'>
@@ -177,7 +170,7 @@ function UserOrderCard({ order }) {
               Subtotal: ₹{shopOrder?.subTotal || 0}
             </p>
 
-<<<<<<< HEAD
+
             <button
               className='bg-blue-500 text-white rounded-md shadow px-2 py-1'
               onClick={() =>
@@ -186,7 +179,6 @@ function UserOrderCard({ order }) {
             >
               Track Order
             </button>
-=======
             {shopOrder.status == "Out for Delivery"  && shopOrder.deliveryBoy != null &&(
               <button
                 className='bg-blue-500 text-white rounded-md shadow px-2 py-1'
@@ -197,7 +189,6 @@ function UserOrderCard({ order }) {
                 Track Order
               </button>
             )}
->>>>>>> recovery-code
           </div>
 
         </div>
