@@ -11,8 +11,8 @@ const server = http.createServer(app);
 const io = new Server(server , {
     cors: {
     origin: [
-        "http://localhost:5173",   // ✅ local frontend
-        "https://biterushfrontend.onrender.com" // ✅ deployed frontend
+        "http://localhost:5173",   //local frontend
+        "https://biterushfrontend.onrender.com" // deployed frontend
     ],     
     credentials: true,
     methods: ["POST" , "GET" , "PUT"]
@@ -22,8 +22,8 @@ const io = new Server(server , {
 app.set("io" , io);
 
 app.use(cors({
-    origin: ["http://localhost:5173",   // ✅ local frontend
-        "https://biterushfrontend.onrender.com"], // ✅ deployed frontend],
+    origin: ["http://localhost:5173",   // local frontend
+        "https://biterushfrontend.onrender.com"], // deployed frontend],
     credentials: true
 }));
 app.use(express.json({limit: '16mb'}));
