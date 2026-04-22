@@ -82,9 +82,7 @@ const orderSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-orderSchema.index({ "shops.shop": 1 });
-orderSchema.index({ "shops.status": 1 });
-orderSchema.index({ createdAt: -1 });
+orderSchema.index({ user: 1, createdAt: -1 });
 
 
 export const Order = mongoose.model("Order", orderSchema);
